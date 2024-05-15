@@ -21,43 +21,47 @@ void setup() {
 void loop() {
 
   // Vérification si le bouton est activé pour la première fois
-  if (digitalRead(bouton) && !boutonActive) {
+  if (!boutonActive && digitalRead(bouton)) {
     boutonActive = true;  // Marquer le bouton comme activé
   }
 
+  //Si le bouton n'est pas actif, lance un nouveau cycle
+  if (!boutonActive) {
+    return;
+  }
+
   // Si le bouton a été activé, exécuter le code suivant
-  if (boutonActive) {
-    float distance = mesurerDistance();
-    // Si un objet est détecté à moins de 20 cm, les moteurs s'arrêtent
-    if (distance < 20) {
-      // Faire une fonction pour arreté les moteur
 
-      //Fin d'une loop plus tôt, ne lance jamais la fonction avance() et donc stop le robot à chaque fois que le code passe ici
-      return;
-    }
+  float distance = mesurerDistance();
+  // Si un objet est détecté à moins de 20 cm, les moteurs s'arrêtent
+  if (distance < 20) {
+    // Faire une fonction pour arreté les moteur
+
+    //Fin d'une loop plus tôt, ne lance jamais la fonction avance() et donc stop le robot à chaque fois que le code passe ici
+    return;
+  }
 
 
 
+  {
+    //Si compatible avec le robot, peut être changer avec analogRead() pour avoir des infos + précises que true/false et faire un calcul
+    //d'angle afin d'adapté la rotation du robot et avoir un mouvement fluide
+    int in1_val = digitalRead(IN1);
+    int in4_val = digitalRead(IN4);
+
+
+    if ((in1_val) && (!in4_val))  //S'il y a du noir à gauche et du blanc à droite, tourner à gauche
     {
-      //Si compatible avec le robot, peut être changer avec analogRead() pour avoir des infos + précises que true/false et faire un calcul
-      //d'angle afin d'adapté la rotation du robot et avoir un mouvement fluide
-      int in1_val = digitalRead(IN1);
-      int in4_val = digitalRead(IN4);
-
-
-      if ((in1_val) && (!in4_val))  //S'il y a du noir à gauche et du blanc à droite, tourner à gauche
-      {
-        Serial.println("Tourner à gauche");
-        tourneGauche();
-      } else if ((!in1_val) && (in4_val))  //S'il y a du blanc à gauche et du noir à droite, tourner à droite
-      {
-        Serial.println("Tourner à droite");
-        tourneDroite();
-      } else  //Si les conditions plus haut ne s'appliquent pas, continuer tout droit
-      {
-        Serial.println("Continuer tout droit");
-        avance();
-      }
+      Serial.println("Tourner à gauche");
+      tourneGauche();
+    } else if ((!in1_val) && (in4_val))  //S'il y a du blanc à gauche et du noir à droite, tourner à droite
+    {
+      Serial.println("Tourner à droite");
+      tourneDroite();
+    } else  //Si les conditions plus haut ne s'appliquent pas, continuer tout droit
+    {
+      Serial.println("Continuer tout droit");
+      avance();
     }
   }
 }
